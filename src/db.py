@@ -1,5 +1,5 @@
-from peewee import *
-from auth import User, Card
+from peewee import Model, SqliteDatabase, AutoField, TextField, FloatField
+from auth import User, Card, UserManager
 
 db = SqliteDatabase('sqlite.db')
 
@@ -10,7 +10,7 @@ class BaseModel(Model):
 class UserModel(BaseModel):
     ID = AutoField()
     name = TextField(null=False, unique=False)
-
+    password = TextField(null=False)
     card_num = TextField(null=True)
     card_cid = TextField(null=True)
     card_sid = TextField(null=True)
@@ -40,7 +40,6 @@ db.create_tables([UserModel])
 # Close the database connection
 # db.close()
 
-
 def create_new_user(user: User):
     try:
         # Extract card details if available
@@ -51,23 +50,26 @@ def create_new_user(user: User):
 
         # Create a new user
         new_user = UserModel.create(
-            ID=user.ID,
             name=user.name,
+            password=user.password,
             card_num=card_num,
             card_cid=card_cid,
             card_sid=card_sid,
-            card_cash=card_cash
+            card_cash=card_cash,
         )
         new_user.save()
         print(f"User {user.name} created successfully.")
     except ValueError as e:
         print(f"Validation error: {e}")
-    except IntegrityError as e:
-        print(f"Database integrity error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def card_is_exist(card_num: str):
+def user_is_exists(username: str):
+    user = UserModel.select().where(UserModel.name == username)
+    print(type(UserModel.name), UserModel.name)
+    return user.exists()
+
+def card_is_exists(card_num: str):
     card = UserModel.select().where(UserModel.card_num == card_num)
 
     if card.exists():
@@ -75,6 +77,10 @@ def card_is_exist(card_num: str):
 
     else: 
         return False
+
+def get_user_password(username: str):
+    user = UserModel.get(UserModel.name==username)
+    return user.password
 
 def update_card(user: User, new_card: Card):
     userM = UserModel.select().where(UserModel.card_num == user.card.num)
@@ -90,7 +96,7 @@ def update_card(user: User, new_card: Card):
 
 
 def update_card_cash(user: User, new_cash: float):
-    if card_is_exist(card_num=user.card.num):
+    if card_is_exists(card_num=user.card.num):
         user_card = UserModel.get(UserModel.card_num == user.card.num)
         user_card.cash = new_cash
         print("card cash updated...")

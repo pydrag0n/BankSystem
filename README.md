@@ -9,7 +9,8 @@
 - 🟥 SuperUser
 - 🟥 Logging
 - 🟥 Good code?
+- 🟩 Registration and authentication
 
 ----
 
-> v0.0.4
+> v0.0.9

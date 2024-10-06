@@ -1,3 +1,5 @@
+import db
+
 class Card:
     def __init__(self, num: str, cid: str, sid: str, cash: float=0.0):
 
@@ -71,31 +73,31 @@ class Card:
 
 
 class User:
-    def __init__(self, ID: int, name: str, card: Card=None):
-        self.ID = ID
+    def __init__(self, name: str, password: str, card: Card=None):
+        # self.ID = ID
         self.name = name
+        self.password = password
         self.card = card
 
 
 class UserManager:
-    def __init__(self):
-        self.users = {}
-
-    def register(self, user: User, password: str, confirm_password: str):
-        if password != confirm_password:
+    def register(self, user: User, confirm_password: str):
+        if user.password != confirm_password:
             return "IncorrectPasswords", False
-        if user.ID in self.users:
+        if db.user_is_exists(user.name):
             return "UserAlreadyExists", False
         else:
-            self.users[user.ID] = password
+            db.create_new_user(user)
             return "Registered", True
 
-    def authenticate(self, user: User, password: str):
-        if user.ID in self.users:
-            if self.users[user.ID] == password:
+    def authenticate(self, user: User,):
+        if db.user_is_exists(user.name):
+            
+            if db.get_user_password(user.name) == user.password:
                 return "Authenticated", True
             else:
                 return "IncorrectPassword", False
         else:
+            print(user.name)
+            print(db.user_is_exists(user.name))
             return "IncorrectUsernameOrPassword", False
-

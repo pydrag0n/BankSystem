@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from datetime import timedelta
 
-from auth import UserManager, User 
+from db import *
+# from auth import UserManager, User, Card
+from random import randint
 
 UserOBJ = UserManager()
 app = Flask(__name__)
@@ -15,41 +17,40 @@ def mainpage():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if not (session.get('cardNum') is None):
+    if not (session.get('username') is None):
         return redirect(url_for("user_profile"))
 
     if request.method == "POST":
-        cardNum = request.form.get("UserID")
+        username = request.form.get("username")
         password = request.form.get("password")
         confim_passwd = request.form.get("repeat_password")
         print(password, confim_passwd)
         if password == confim_passwd and confim_passwd != None and password != None:
-            user = User(cardNum)
-            _, not_err = UserOBJ.register(user, password, confim_passwd)
+            user = User(username, password)
+            err_type, not_err = UserOBJ.register(user, confim_passwd)
             print(not_err)
+            print(err_type)
             
             if not_err:
-                session['cardNum'] = cardNum
-                session.permanent = False
-                
+                session['username'] = username
+
                 return redirect(url_for('user_profile'))
 
     return render_template("signup.html")
 
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
-    if not (session.get('cardNum') is None):
+    if not (session.get('username') is None):
         return redirect(url_for("user_profile"))
 
     if request.method == "POST":
-        cardNum = request.form.get("UserID")
+        username = request.form.get("username")
         password = request.form.get("password")
-        user = User(cardNum)
-        _, not_err = UserOBJ.authentication(user, password)
-        print(not_err)
+        user = User(username, password)
+        err_type, not_err = UserOBJ.authenticate(user)
+        print(err_type, not_err)
         if not_err:
-            session['cardNum'] = cardNum
-            session.permanent = False
+            session['username'] = username
             
             return redirect(url_for("user_profile"))
             
@@ -58,7 +59,7 @@ def signin():
 @app.route("/user_profile")
 def user_profile():
 
-    if not (session.get('cardNum') is None):
+    if not (session.get('username') is None):
         cash = 0
         return render_template("user_profile.html", cash=cash)
     else:
@@ -70,8 +71,8 @@ def admin():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    if not (session.get('cardNum') is None):
-        session.pop('cardNum', None)
+    if not (session.get('username') is None):
+        session.pop('username', None)
         return redirect(url_for('signin'))
     return redirect(url_for('signin'))
 
