@@ -1,5 +1,6 @@
 class Card:
-    def __init__(self, num: str, cid: str, sid: str, cash: int=0):
+    def __init__(self, num: str, cid: str, sid: str, cash: float=0.0):
+
         if not self.validate_card_number(num):
             raise ValueError("Invalid card number format")
         if not self.validate_cid(cid):
@@ -8,12 +9,12 @@ class Card:
             raise ValueError("Invalid SID format")
         if not self.validate_cash(cash):
             raise ValueError("Invalid CASH format")
-        
+
         self.__num = num
         self.__cid = cid
         self.__sid = sid
         self.__cash = cash
-        
+
 
     def validate_card_number(self, num: str):
         # Remove any non-digit characters
@@ -45,13 +46,12 @@ class Card:
         # Example validation: 3 digits
         return len(sid) == 3 and sid.isdigit()
 
-    def validate_cash(self, cash: int):
-        
-        if cash >= 0:
+    def validate_cash(self, cash: float):
+
+        if cash >= 0.0:
             return True
         else:
             return False
-    
 
     @property
     def num(self):
@@ -64,18 +64,17 @@ class Card:
     @property
     def sid(self):
         return self.__sid
-    
+
     @property
     def cash(self):
         return self.__cash
 
 
 class User:
-    def __init__(self, ID: int, name: str, card: Card):
+    def __init__(self, ID: int, name: str, card: Card=None):
         self.ID = ID
         self.name = name
         self.card = card
-
 
 
 class UserManager:
@@ -99,13 +98,4 @@ class UserManager:
                 return "IncorrectPassword", False
         else:
             return "IncorrectUsernameOrPassword", False
-
-    def update_card(self, user: User, new_card: Card):
-        self.user.card = new_card
-
-    def get_all_users_list(self):
-        user_list = ""
-        for key, val in self.users.items():
-            user_list += f"|| [ID]: {key} || [PASSD]: {val} ||\n"
-        return user_list
 

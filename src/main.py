@@ -59,13 +59,14 @@ def signin():
 def user_profile():
 
     if not (session.get('cardNum') is None):
-        return render_template("user_profile.html", cash=100)
+        cash = 0
+        return render_template("user_profile.html", cash=cash)
     else:
         return redirect(url_for('signin'))
 
 @app.route("/admin")
 def admin():
-    return f"{UserOBJ.get_all_users_list()}"
+    return "asd"
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
