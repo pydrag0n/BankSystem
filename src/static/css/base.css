@@ -1,0 +1,12 @@
+* {
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+
+
+nav {
+    background-color: black;
+    width: 100%;
+    padding: 20px;
+}
